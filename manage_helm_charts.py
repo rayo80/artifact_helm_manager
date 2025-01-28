@@ -14,6 +14,10 @@ HELM_UNINSTALL_CMD = "helm uninstall"
 HELM_REPO_REMOVE_CMD = "helm repo remove"
 
 
+def concat_with_spaces(*cadenas):
+    return " ".join(cadenas)
+
+
 def query_artifact_hub(keyword, num_results=10):
     params = {
         'ts_query_web': keyword,
@@ -52,10 +56,12 @@ def add_helm_repo(repo_url):
 def install_or_upgrade_chart(chart_name, release_name, namespace, upgrade=False):
     if upgrade:
         print(f"Upgrading {chart_name} to release {release_name} in {namespace} namespace...")
-        subprocess.run([HELM_UPGRADE_CMD, release_name, chart_name, "--namespace", namespace], check=True)
+        command = concat_with_spaces(HELM_INSTALL_CMD, release_name, chart_name, "--namespace", namespace)
+        subprocess.run(command, check=True)
     else:
         print(f"Installing {chart_name} as release {release_name} in {namespace} namespace...")
-        subprocess.run([HELM_INSTALL_CMD, release_name, chart_name, "--namespace", namespace], check=True)
+        command = concat_with_spaces(HELM_INSTALL_CMD, release_name, chart_name, "--namespace", namespace)
+        subprocess.run(command, check=True)
 
 
 def list_deployed_releases(namespace=None):
@@ -104,17 +110,17 @@ def main():
             # Add the Helm repository to your system
             add_helm_repo(chart_details['repository']["url"])
 
-        # elif choice == "3":
-        #     chart_name = input("Enter the chart name: ")
-        #     release_name = input("Enter the release name: ")
-        #     namespace = input("Enter the namespace (default 'default'): ") or "default"
-        #     upgrade = input("Do you want to upgrade an existing release? (y/n): ").lower() == "y"
-        #     install_or_upgrade_chart(chart_name, release_name, namespace, upgrade)
-        #
-        # elif choice == "4":
-        #     namespace = input("Enter the namespace to list releases (or press Enter for all namespaces): ")
-        #     list_deployed_releases(namespace or None)
-        #
+        elif choice == "3":
+            chart_name = input("Enter the local direction chart name:  (reporef/{repo_name})")  # helm search repo {ref}
+            release_name = input("Enter the release name: ")
+            namespace = input("Enter the namespace (default 'default'): ") or "default"
+            upgrade = input("Do you want to upgrade an existing release? (y/n): ").lower() == "y"
+            install_or_upgrade_chart(chart_name, release_name, namespace, upgrade)
+
+        elif choice == "4":
+            namespace = input("Enter the namespace to list releases (or press Enter for all namespaces): ")
+            list_deployed_releases(namespace or None)
+
         # elif choice == "5":
         #     release_name = input("Enter the release name to uninstall: ")
         #     cleanup_repo = input("Do you want to clean up the Helm repository as well? (y/n): ").lower() == "y"
