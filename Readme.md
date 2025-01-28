@@ -8,5 +8,10 @@ you need send some parameters not url
 test with
 ![img_4.png](img_4.png)
 
-# Update 
-![img_7.png](img_7.png)
+# Update | Create
+![img_10.png](img_10.png)
+# List
+![img_8.png](img_8.png)
+
+# Delete
+![img_9.png](img_9.png)

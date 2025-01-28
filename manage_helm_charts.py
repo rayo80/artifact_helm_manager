@@ -65,18 +65,18 @@ def install_or_upgrade_chart(chart_name, release_name, namespace, upgrade=False)
 
 
 def list_deployed_releases(namespace=None):
-    cmd = [HELM_LIST_CMD]
+    cmd = HELM_LIST_CMD
     if namespace:
-        cmd.extend(["--namespace", namespace])
+        cmd = cmd + " --namespace" + " " + namespace
     subprocess.run(cmd)
 
 
 def uninstall_release(release_name, cleanup_repo=False):
     print(f"Uninstalling release {release_name}...")
-    subprocess.run([HELM_UNINSTALL_CMD, release_name], check=True)
+    subprocess.run(HELM_UNINSTALL_CMD + " " + release_name, check=True)
     if cleanup_repo:
         print("Cleaning up Helm repositories...")
-        subprocess.run([HELM_REPO_REMOVE_CMD, release_name], check=True)
+        subprocess.run(HELM_REPO_REMOVE_CMD + " " + release_name, check=True)
 
 
 def main():
@@ -121,10 +121,10 @@ def main():
             namespace = input("Enter the namespace to list releases (or press Enter for all namespaces): ")
             list_deployed_releases(namespace or None)
 
-        # elif choice == "5":
-        #     release_name = input("Enter the release name to uninstall: ")
-        #     cleanup_repo = input("Do you want to clean up the Helm repository as well? (y/n): ").lower() == "y"
-        #     uninstall_release(release_name, cleanup_repo)
+        elif choice == "5":
+            release_name = input("Enter the release name to uninstall: ")
+            cleanup_repo = input("Do you want to clean up the Helm repository as well? (y/n): ").lower() == "y"
+            uninstall_release(release_name, cleanup_repo)
 
         elif choice == "6":
             print("Exiting...")
