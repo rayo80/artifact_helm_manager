@@ -1,3 +1,4 @@
+import os
 import subprocess
 import requests
 import sys
@@ -38,14 +39,14 @@ def get_chart_details(repo_name, chart_name):
     # name can be repeated
     response = requests.get(f"{ARTIFACT_HUB_API_URL_BASE}/packages/helm/{repo_name}/{chart_name}")
     response.raise_for_status()
-    print('response', response)
     return response.json()
 
 
 def add_helm_repo(repo_url):
+    val = input("Enter the local reference name: ")
     print(f"Adding Helm repository from {repo_url}...")
-    subprocess.run([HELM_REPO_ADD_CMD, repo_url], check=True)
-    subprocess.run(["helm", "repo", "update"], check=True)  # Update repo index
+    subprocess.run(HELM_REPO_ADD_CMD + " " + val + " " + repo_url, shell=True, check=True)
+    subprocess.run("helm repo update", shell=True, check=True)  # Update repo index
 
 
 def install_or_upgrade_chart(chart_name, release_name, namespace, upgrade=False):
@@ -95,10 +96,13 @@ def main():
             print(f"Name: {chart_details['name']}")
             print(f"Description: {chart_details['description']}")
             print(f"Version: {chart_details['version']}")
+            if chart_details.get('maintainers'):
+                print(f"Maintainers: {', '.join([m['name'] for m in chart_details.get('maintainers')])}")
+
             print(f"ID: {chart_details['package_id']}")
 
             # Add the Helm repository to your system
-            # add_helm_repo(chart_details['repository']['url'])
+            add_helm_repo(chart_details['repository']["url"])
 
         # elif choice == "3":
         #     chart_name = input("Enter the chart name: ")
